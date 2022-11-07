@@ -43,7 +43,91 @@ export default {
   }
 }
 
+function addRow(row, properties, htmlData, params, indent="") {
+  // Add the row starting tag
+  htmlData += '<tr>'
+
+  // Print selected properties only
+  for (let n = 0; n < properties.length; n++) {
+    let stringData = row
+
+    // Support nested objects
+    const property = properties[n].field.split('.')
+    if (property.length > 1) {
+      for (let p = 0; p < property.length; p++) {
+        stringData = stringData[property[p]]
+      }
+    } else {
+      stringData = stringData[properties[n].field]
+    }
+
+    if (n == 0 && indent !== "") {
+      stringData = indent + ">&nbsp;" + stringData
+    }
+
+    // Add the row contents and styles
+    htmlData += '<td style="width:' + properties[n].columnSize + params.gridStyle + '">' + stringData + '</td>'
+  }
+
+  // Add the row closing tag
+  htmlData += '</tr>'
+
+  const children = params.childFieldName || "";
+
+  if (children && row[children] && row[children].length) {
+    for (let m = 0; m < row[children].length; m++) {
+      if (row[children][m]) {
+        htmlData = addRow(row[children][m], properties, htmlData, params, indent + "&nbsp;&nbsp;");
+      }
+    }
+  }
+  return htmlData;
+}
+
 function jsonToHTML (params) {
+  // Get the row and column data
+  const data = params.printable
+  const properties = params.properties
+
+  // Create a html table
+  let htmlData = '<table style="border-collapse: collapse; width: 100%;">'
+
+  // Check if the header should be repeated
+  if (params.repeatTableHeader) {
+    htmlData += '<thead>'
+  }
+
+  // Add the table header row
+  htmlData += '<tr>'
+
+  // Add the table header columns
+  for (let a = 0; a < properties.length; a++) {
+    htmlData += '<th style="width:' + properties[a].columnSize + ';' + params.gridHeaderStyle + '">' + capitalizePrint(properties[a].displayName) + '</th>'
+  }
+
+  // Add the closing tag for the table header row
+  htmlData += '</tr>'
+
+  // If the table header is marked as repeated, add the closing tag
+  if (params.repeatTableHeader) {
+    htmlData += '</thead>'
+  }
+
+  // Create the table body
+  htmlData += '<tbody>'
+
+  // Add the table data rows
+  for (let i = 0; i < data.length; i++) {
+    htmlData = addRow(data[i], properties, htmlData, params)
+  }
+
+  // Add the table and body closing tags
+  htmlData += '</tbody></table>'
+
+  return htmlData
+}
+
+function jsonToHTML2 (params) {
   // Get the row and column data
   const data = params.printable
   const properties = params.properties

@@ -153,6 +153,47 @@
       })
     }
 
+    function printTreeStructureJson() {
+      let data = []
+      for (let i=0; i <= 100; i++) {
+        let current = {
+          test1: createRandomString(),
+          test2: {
+            a: createRandomString()
+          }
+        };
+        data.push(current);
+
+        current.children = [];
+        for (let j = 0; j < 5; j++) {
+          current.children.push({
+            test1: createRandomString(),
+            test2: {
+              a: createRandomString()
+            }
+          });
+        }
+      }
+
+      printJS({
+        childFieldName: 'children',
+        printable: data,
+        properties: [
+          {
+            field: 'test1',
+            displayName: 'test 1',
+            columnSize: 1
+          },
+          {
+            field: 'test2.a',
+            displayName: 'test 2 - a',
+            columnSize: 4
+          }
+        ],
+        type: 'json'
+      })
+    }
+
     function createRandomString() {
       var text = "";
       var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -252,6 +293,9 @@
         </button>
         <button onClick='printNestedJson();'>
           Print Nested JSON
+        </button>
+        <button onClick='printTreeStructureJson();'>
+          Print Tree Structure JSON
         </button>
       </p>
       <p>

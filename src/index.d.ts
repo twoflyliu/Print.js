@@ -6,6 +6,7 @@ declare namespace printJS {
 
   interface Configuration {
     printable: any;
+    childFieldName?: string;
     fallbackPrintable?: string;
     type?: PrintTypes;
     documentTitle?: string;
